@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ <!-- namepace要求唯一，避免重复 -->
+<mapper namespace="com.bw.mapper.StoreMapper">
+	<!-- //	展示店铺以及所售商品表 -->
+	<select id="selectList" resultType="map" parameterType="java.lang.String">
+		SELECT s.sid,s.sname,s.time,GROUP_CONCAT(b.bname) 
+		bnames from store s left join  showw h on s.sid=h.sid
+		 LEFT JOIN band b on b.bid=h.bid 
+		 <where>
+		 	<if test="sname!=null and sname!=''">
+		 		s.sname like "%${sname}%"
+		 	</if>
+		 </where>	
+		 GROUP BY s.sid
+	</select>
+	<!-- //添加店铺//商品复选框的回显public List<Band> selectAddShow(); -->
+	<insert id="insertStore" parameterType="Store">
+		insert into store values(null,#{sname},#{time}) 
+	</insert>
+	<select id="selectAddShow" resultType="Band">
+		select * from band 
+	</select>
+	<!-- //	为店铺添加商品
+	public int insertshow(int bid,int sid); -->
+	<insert id="insertshow">
+		insert into showw values(null,#{sid},#{bid})
+	</insert>
+<!-- 	//	批量删除
+	public int delsStore(String bids); -->
+	<delete id="delsStore">
+		delete from store where sid in(${bids})
+	</delete>
+	<!-- //	查看详情
+	public Store selectOneStore(int sid); -->
+	<select id="selectOneStore" parameterType="int" resultType="Store">
+		SELECT s.sid,s.sname,s.time,GROUP_CONCAT(b.bname) 
+		bnames from store s left join  showw h on s.sid=h.sid
+		 LEFT JOIN band b on b.bid=h.bid 
+		 <where>
+		 	s.sid=#{sid}
+		 </where>
+		 GROUP BY s.sid
+	</select>
+</mapper>
